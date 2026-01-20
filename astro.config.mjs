@@ -1,15 +1,17 @@
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import tailwindcss from '@tailwindcss/vite'; // <--- Importamos el plugin de Vite
+import tailwindcss from '@tailwindcss/vite';
+import cloudflare from '@astrojs/cloudflare';
 
 import preact from "@astrojs/preact";
 
 export default defineConfig({
-  // Eliminamos tailwind() de 'integrations'
+  output: 'static',
+  adapter: cloudflare(),
   integrations: [preact()], 
   
   vite: {
-    plugins: [tailwindcss()], // <--- Lo agregamos aquí
+    plugins: [tailwindcss()],
   },
 
   i18n: {
