@@ -1,0 +1,132 @@
+---
+// src/components/Header.astro
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { useTranslations } from '../i18n/utils';
+
+// 1. Detectar idioma actual
+const currentLang = Astro.currentLocale || 'es';
+
+// 2. Cargar traductor
+const t = useTranslations(currentLang as 'es' | 'en');
+
+// 3. Generar rutas dinámicas
+const currentPath = Astro.url.pathname.replace(/^\/(en|es)\//, '/').replace(/^\//, ''); 
+const translatePath = (lang: string) => getRelativeLocaleUrl(lang, currentPath);
+---
+
+<header class="sticky top-0 z-50 w-full">
+  <nav class="navbar bg-base-100/90 backdrop-blur-md border-b border-base-200">
+    
+    <div class="navbar-start">
+      <div class="dropdown">
+        <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
+        </div>
+        <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+          <li><a href={getRelativeLocaleUrl(currentLang, 'about')}>{t('nav.about')}</a></li>
+          <li><a href={getRelativeLocaleUrl(currentLang, 'blog')}>{t('nav.blog')}</a></li>
+        </ul>
+      </div>
+      
+      <a href={getRelativeLocaleUrl(currentLang, '/')} class="btn btn-ghost text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hover:bg-none">
+        🍅 Pomodoro
+      </a>
+    </div>
+
+    <div class="navbar-end gap-2">
+        
+      <ul class="menu menu-horizontal px-1 hidden lg:flex">
+        <li><a href={getRelativeLocaleUrl(currentLang, 'about')}>{t('nav.about')}</a></li>
+        <li><a href={getRelativeLocaleUrl(currentLang, 'blog')}>{t('nav.blog')}</a></li>
+      </ul>
+
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-sm m-1">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S12 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S12 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
+            </svg>
+            <span class="text-xs">{currentLang.toUpperCase()}</span>
+        </div>
+        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32">
+            <li><a href={translatePath('es')} class="lang-link" data-lang="es">🇪🇸 Español</a></li>
+            <li><a href={translatePath('en')} class="lang-link" data-lang="en">🇺🇸 English</a></li>
+        </ul>
+      </div>
+
+      <label class="swap swap-rotate btn btn-ghost btn-circle btn-sm">
+        <input type="checkbox" id="theme-controller" class="theme-controller" value="dark" />
+        <svg class="swap-off fill-current w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"/></svg>
+        <svg class="swap-on fill-current w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z"/></svg>
+      </label>
+
+    </div>
+  </nav>
+</header>
+
+<script is:inline>
+  const currentTheme = (() => {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+      return localStorage.getItem('theme');
+    }
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'business'; 
+    }
+    return 'nord'; 
+  })();
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  document.addEventListener('DOMContentLoaded', () => {
+    const themeController = document.getElementById('theme-controller');
+    if (themeController) {
+      themeController.checked = currentTheme === 'business';
+    }
+
+ 
+    const themeLabel = document.querySelector('.swap');
+    if (themeLabel) {
+      themeLabel.addEventListener('click', () => {
+        setTimeout(() => {
+          const isChecked = themeController.checked;
+          const newTheme = isChecked ? 'business' : 'nord';
+          document.documentElement.setAttribute('data-theme', newTheme);
+          localStorage.setItem('theme', newTheme);
+        }, 0);
+      });
+    }
+  });
+</script>
+
+<script is:inline>
+  const savedLang = localStorage.getItem('language');
+
+  
+  // Si tenemos un idioma guardado...
+  if (savedLang) {
+    const p = window.location.pathname;
+    // Detectar si estamos en ruta de inglés (ej: /en, /en/about)
+    const isEn = p.startsWith('/en/') || p === '/en';
+    
+    // Caso 1: Preferencia Español ('es') pero estamos en Inglés -> Ir a Raíz (/)
+    if (savedLang === 'es' && isEn) {
+       // Reemplazamos '/en' o '/en/' del inicio por '/'
+       // Ej: /en/about -> /about, /en -> /
+       const newPath = p.replace(/^\/en(\/|$)/, '/');
+       window.location.href = newPath || '/'; // Fallback a / si queda vacío
+    }
+    // Caso 2: Preferencia Inglés ('en') pero estamos en Español (Raíz) -> Ir a /en
+    else if (savedLang === 'en' && !isEn) {
+       // Agregamos /en al inicio. Si es /, se convierte en /en
+       const cleanPath = p === '/' ? '' : p;
+       window.location.href = `/en${cleanPath}`;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const langLinks = document.querySelectorAll('.lang-link');
+    langLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        const lang = e.target.getAttribute('data-lang');
+        localStorage.setItem('language', lang);
+      });
+    });
+  });
+</script>

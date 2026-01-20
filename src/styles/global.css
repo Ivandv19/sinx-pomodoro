@@ -1,0 +1,15 @@
+/* src/styles/global.css */
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* CONFIGURACIÓN DE TEMAS */
+/* Usaremos 'nord' para claro (muy limpio, gris azulado) */
+/* Usaremos 'business' para oscuro (gris oscuro serio, alto contraste) */
+
+@theme {
+  --color-primary: #ea580c; /* Un Naranja/Rojo quemado fuerte (Orange-600) */
+  --color-primary-content: #ffffff; /* Texto blanco sobre el naranja */
+  
+  --color-secondary: #4b5563; /* Gris serio para botones secundarios */
+}
+

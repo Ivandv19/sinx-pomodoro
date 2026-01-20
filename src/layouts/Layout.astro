@@ -1,0 +1,64 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+// 1. Definimos las propiedades que aceptará el Layout
+interface Props {
+	title: string;
+	description?: string; // El ? significa que es opcional
+	image?: string;
+}
+
+// 2. Extraemos los valores o ponemos unos por defecto
+const { 
+	title, 
+	description = "Maximiza tu productividad y concentración. La herramienta ideal para estudiantes, profesionales y creativos que buscan enfoque total.", 
+	image = "/og-image.png"
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		
+		<title>{title} | Sinx Pomodoro</title>
+        <script is:inline>
+            // 1. Buscamos si hay algo guardado
+            const savedTheme = localStorage.getItem('theme');
+            
+            // 2. Si no, miramos la preferencia del sistema
+            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches 
+                ? 'business' 
+                : 'nord';
+            
+            // 3. Decidimos el tema final
+            const theme = savedTheme || systemTheme;
+            
+            // 4. Lo aplicamos AL INSTANTE al HTML
+            document.documentElement.setAttribute('data-theme', theme);
+        </script>
+		<meta name="description" content={description} />
+
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		<meta property="og:image" content={image} />
+
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={image} />
+	</head>
+	<body class="min-h-screen flex flex-col bg-base-100 font-sans">
+		<Header />
+		<main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+			<slot />
+		</main>
+		<Footer />
+	</body>
+</html>

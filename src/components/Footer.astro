@@ -1,0 +1,33 @@
+---
+// src/components/Footer.astro
+import { useTranslations } from '../i18n/utils';
+
+const currentLang = Astro.currentLocale || 'es';
+const t = useTranslations(currentLang as 'es' | 'en');
+const year = new Date().getFullYear();
+---
+<footer class="footer footer-center p-10 bg-base-200 text-base-content rounded-t-2xl mt-auto">
+  
+  <nav class="grid grid-flow-col gap-4">
+    <a href={`/${currentLang}/about`} class="link link-hover">{t('footer.whatis')}</a>
+  </nav> 
+
+  <aside>
+    <div class="flex items-center gap-2 justify-center mb-2">
+        <span class="text-2xl">🍅</span>
+        <span class="font-bold text-xl tracking-tight">Pomodoro</span>
+    </div>
+    
+    <p class="font-medium">
+      {t('footer.slogan')}
+    </p>
+
+    <p class="text-xs mt-4 opacity-60">
+        {t('footer.developed')} <span class="font-bold text-primary">Sinx</span>
+        <span class="badge badge-outline badge-xs ml-1">Astro</span>
+        <span class="badge badge-outline badge-xs ml-1">Bun</span>
+    </p>
+    
+    <p class="text-xs opacity-50">Copyright © {year} - {t('footer.rights')}</p>
+  </aside>
+</footer>
