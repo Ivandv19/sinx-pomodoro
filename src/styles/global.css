@@ -7,9 +7,29 @@
 /* Usaremos 'business' para oscuro (gris oscuro serio, alto contraste) */
 
 @theme {
-  --color-primary: #ea580c; /* Un Naranja/Rojo quemado fuerte (Orange-600) */
-  --color-primary-content: #ffffff; /* Texto blanco sobre el naranja */
-  
-  --color-secondary: #4b5563; /* Gris serio para botones secundarios */
+  --color-primary: #ea580c;
+  /* Un Naranja/Rojo quemado fuerte (Orange-600) */
+  --color-primary-content: #ffffff;
+  /* Texto blanco sobre el naranja */
+
+  --color-secondary: #4b5563;
+  /* Gris serio para botones secundarios */
 }
 
+
+/* ANIMACIONES */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out forwards;
+}

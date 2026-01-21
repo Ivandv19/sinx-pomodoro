@@ -9,6 +9,7 @@ export default defineConfig({
   output: 'static',
   adapter: cloudflare(),
   site: 'https://sinx-pomodoro.pages.dev',
+  prefetch: true,
   integrations: [preact(), sitemap()], 
   
   vite: {

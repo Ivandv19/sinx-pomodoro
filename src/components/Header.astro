@@ -74,7 +74,7 @@ const translatePath = (lang: string) => getRelativeLocaleUrl(lang, currentPath);
     return 'nord'; 
   })();
   document.documentElement.setAttribute('data-theme', currentTheme);
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('astro:page-load', () => {
     const themeController = document.getElementById('theme-controller');
     if (themeController) {
       themeController.checked = currentTheme === 'business';
@@ -120,7 +120,7 @@ const translatePath = (lang: string) => getRelativeLocaleUrl(lang, currentPath);
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('astro:page-load', () => {
     const langLinks = document.querySelectorAll('.lang-link');
     langLinks.forEach(link => {
       link.addEventListener('click', (e) => {

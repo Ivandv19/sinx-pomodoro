@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -27,6 +28,16 @@ const {
 		<meta name="generator" content={Astro.generator} />
 		
 		<title>{title} | Sinx Pomodoro</title>
+		<ClientRouter />
+		<!-- Google Analytics (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-L4W9E2FP48"></script>
+		<script is:inline>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+
+			gtag('config', 'G-L4W9E2FP48');
+		</script>
         <script is:inline>
             // 1. Buscamos si hay algo guardado
             const savedTheme = localStorage.getItem('theme');
@@ -56,7 +67,7 @@ const {
 	</head>
 	<body class="min-h-screen flex flex-col bg-base-100 font-sans">
 		<Header />
-		<main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+		<main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in-up">
 			<slot />
 		</main>
 		<Footer />
