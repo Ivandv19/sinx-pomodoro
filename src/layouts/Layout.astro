@@ -15,7 +15,7 @@ interface Props {
 const { 
 	title, 
 	description = "Maximiza tu productividad y concentración. La herramienta ideal para estudiantes, profesionales y creativos que buscan enfoque total.", 
-	image = "/og-image.png"
+	image = new URL("/og-image.png", Astro.site || "https://sinx-pomodoro.pages.dev").toString()
 } = Astro.props;
 ---
 

@@ -1,14 +1,11 @@
 // src/components/TimerRun.tsx
 import { useState, useEffect, useMemo } from 'preact/hooks';
 import { usePomodoroStats, type SessionType } from '../hooks/usePomodoroStats';
-import { loadSavedState, clearSavedState, useTimerPersistence } from '../hooks/useTimerPersistence';
-import { useTimerState } from '../hooks/useTimerState';
 import DailySummary from './DailySummary';
 
 interface Props {
     initialMinutes: number;
     onReset: () => void;
-    lang?: 'es' | 'en';
 }
 
 interface Session {
@@ -19,17 +16,11 @@ interface Session {
 
 const ALARM_SOUND = "https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=tibetan-bowl-singing-72688.mp3";
 
-export default function TimerRun({ initialMinutes, onReset, lang = 'es' }: Props) {
+export default function TimerRun({ initialMinutes, onReset }: Props) {
   
   const { addSession, history, hours, minutes, sessionCount } = usePomodoroStats();
 
-  // 🔥 Load saved state
-  const savedState = loadSavedState();
-
   const schedule = useMemo(() => {
-    // If we have saved state, use its schedule
-    if (savedState) return savedState.schedule;
-    
     const queue: Session[] = [];
     let remainingMins = initialMinutes;
     let cycleCount = 1;
@@ -55,41 +46,19 @@ export default function TimerRun({ initialMinutes, onReset, lang = 'es' }: Props
     return queue;
   }, [initialMinutes]);
 
-  // 🔥 Use custom hooks for state management
-  const {
-    currentSessionIndex,
-    setCurrentSessionIndex,
-    timeLeft,
-    setTimeLeft,
-    isActive,
-    setIsActive,
-    isSessionFinished,
-    setIsSessionFinished,
-    sessionEndTime,
-    setSessionEndTime,
-    blockStartTime,
-    setBlockStartTime,
-    planStartTime
-  } = useTimerState({ schedule, savedState });
+  const [currentSessionIndex, setCurrentSessionIndex] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(schedule[0]?.duration || 0);
+  const [isActive, setIsActive] = useState(true); 
+  const [isSessionFinished, setIsSessionFinished] = useState(false);
+  
+  const [blockStartTime, setBlockStartTime] = useState(new Date());
+  const [planStartTime] = useState(new Date());
 
   const currentSession = schedule[currentSessionIndex];
   
   useEffect(() => {
     if (Notification.permission !== "granted") Notification.requestPermission();
   }, []);
-
-  // 🔥 Use persistence hook
-  useTimerPersistence({
-    sessionEndTime,
-    currentSessionIndex,
-    schedule,
-    isActive,
-    blockStartTime,
-    planStartTime,
-    initialMinutes,
-    timeLeft,
-    isSessionFinished
-  });
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -111,12 +80,7 @@ export default function TimerRun({ initialMinutes, onReset, lang = 'es' }: Props
     }
 
     if (isActive && timeLeft > 0) {
-      // 🔥 NEW: Calculate time based on timestamp difference, not setInterval
-      interval = setInterval(() => {
-        const now = Date.now();
-        const remaining = Math.max(0, Math.floor((sessionEndTime - now) / 1000));
-        setTimeLeft(remaining);
-      }, 1000);
+      interval = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     } 
     else if (timeLeft === 0 && !isSessionFinished) {
       
@@ -140,12 +104,10 @@ export default function TimerRun({ initialMinutes, onReset, lang = 'es' }: Props
       if (currentSessionIndex < schedule.length - 1) {
           const timeout = setTimeout(() => {
               const nextIndex = currentSessionIndex + 1;
-              const nextDuration = schedule[nextIndex].duration;
               setCurrentSessionIndex(nextIndex);
-              setTimeLeft(nextDuration);
-              setSessionEndTime(Date.now() + nextDuration * 1000); // 🔥 NEW: Set new end time
+              setTimeLeft(schedule[nextIndex].duration);
               setIsActive(true);
-              setBlockStartTime(new Date());
+              setBlockStartTime(new Date()); // 🔥 RESETEAMOS HORA DE INICIO
           }, 1500);
           return () => clearTimeout(timeout);
       } else {
@@ -158,7 +120,7 @@ export default function TimerRun({ initialMinutes, onReset, lang = 'es' }: Props
         if (interval) clearInterval(interval);
         document.title = "Pomodoro Flux"; 
     };
-  }, [isActive, timeLeft, isSessionFinished, currentSession, currentSessionIndex, schedule, blockStartTime, sessionEndTime]); // Agregamos blockStartTime a deps
+  }, [isActive, timeLeft, isSessionFinished, currentSession, currentSessionIndex, schedule, blockStartTime]); // Agregamos blockStartTime a deps
 
   const getTheme = (type: SessionType) => {
       switch (type) {
@@ -199,12 +161,6 @@ export default function TimerRun({ initialMinutes, onReset, lang = 'es' }: Props
       const finishDate = new Date(now.getTime() + secondsRemainingTotal * 1000);
       return finishDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }, [timeLeft, currentSessionIndex, schedule]);
-
-  // 🔥 Clear localStorage when user manually resets
-  const handleReset = () => {
-    clearSavedState();
-    onReset();
-  };
 
   return (
     <div className="w-full max-w-4xl mx-auto animate-fade-in py-6">
@@ -264,11 +220,11 @@ export default function TimerRun({ initialMinutes, onReset, lang = 'es' }: Props
                         )}
                     </button>
                 ) : (
-                    <button type="button" className={`btn btn-lg h-16 px-10 rounded-full border-none shadow-xl animate-bounce text-white ${theme.bgButton}`} onClick={handleReset}>
+                    <button type="button" className={`btn btn-lg h-16 px-10 rounded-full border-none shadow-xl animate-bounce text-white ${theme.bgButton}`} onClick={onReset}>
                         Nuevo Plan ↺
                     </button>
                 )}
-                <button type="button" onClick={handleReset} className="btn btn-circle btn-ghost opacity-40 hover:opacity-100 tooltip" data-tip="Cancelar Plan">
+                <button type="button" onClick={onReset} className="btn btn-circle btn-ghost opacity-40 hover:opacity-100 tooltip" data-tip="Cancelar Plan">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
@@ -295,7 +251,7 @@ export default function TimerRun({ initialMinutes, onReset, lang = 'es' }: Props
                     const isCurrent = index === currentSessionIndex;
                     const sTheme = getTheme(session.type);
                     return (
-                        <div key={index} className={`relative shrink-0 flex flex-col items-center px-6 snap-center transition-all ${isCurrent ? 'opacity-100 scale-105' : 'opacity-50'}`}>
+                        <div key={index} className={`relative flex-shrink-0 flex flex-col items-center px-6 snap-center transition-all ${isCurrent ? 'opacity-100 scale-105' : 'opacity-50'}`}>
                             <div className={`w-4 h-4 rounded-full border-2 transition-colors z-10 mb-4 ${
                                 isPast ? 'bg-success border-success' : 
                                 isCurrent ? `${sTheme.bgButton} border-white shadow-lg` : 
@@ -317,7 +273,6 @@ export default function TimerRun({ initialMinutes, onReset, lang = 'es' }: Props
 
         {/* 3. 🔥 STATS / TRACKER (COMPONENTIZADO) */}
         <DailySummary 
-            lang={lang}
             history={history} 
             hours={hours} 
             minutes={minutes} 

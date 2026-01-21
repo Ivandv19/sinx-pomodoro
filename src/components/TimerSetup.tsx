@@ -14,10 +14,9 @@ const PRESETS = [
 
 interface Props {
   onStart: (minutes: number) => void;
-  lang?: 'es' | 'en';
 }
 
-export default function TimerSetup({ onStart, lang = 'es' }: Props) {
+export default function TimerSetup({ onStart }: Props) {
   const { history, hours, minutes, sessionCount } = usePomodoroStats();
   
   const [selected, setSelected] = useState<number | null>(null);
@@ -116,7 +115,6 @@ export default function TimerSetup({ onStart, lang = 'es' }: Props) {
               
               {/* Aquí usamos el componente reutilizable */}
               <DailySummary 
-                  lang={lang}
                   history={history} 
                   hours={hours} 
                   minutes={minutes} 
