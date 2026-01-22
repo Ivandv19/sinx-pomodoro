@@ -1,5 +1,5 @@
 // src/components/TimerRun.tsx
-import { useState, useEffect, useMemo } from 'preact/hooks';
+import { useState, useEffect, useMemo, useRef } from 'preact/hooks';
 import { usePomodoroStats, type SessionType } from '../hooks/usePomodoroStats';
 import DailySummary from './DailySummary';
 
@@ -47,19 +47,72 @@ export default function TimerRun({ initialMinutes, onReset, lang }: Props) {
     return queue;
   }, [initialMinutes]);
 
-  const [currentSessionIndex, setCurrentSessionIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(schedule[0]?.duration || 0);
-  const [isActive, setIsActive] = useState(true); 
+  // Clave para localStorage
+  const TIMER_STATE_KEY = 'pomodoro_timer_state';
+
+  // Función para leer estado guardado de forma sincrónica en la inicialización
+  const getSavedState = () => {
+    if (typeof window === 'undefined') return null;
+    try {
+        const saved = localStorage.getItem(TIMER_STATE_KEY);
+        return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+        return null;
+    }
+  };
+
+  const savedState = getSavedState();
+  
+
+
+  const [currentSessionIndex, setCurrentSessionIndex] = useState(() => {
+      if (savedState && savedState.initialMinutes === initialMinutes) {
+          return savedState.currentSessionIndex;
+      }
+      return 0;
+  });
+
+  const [isActive, setIsActive] = useState(() => {
+    if (savedState && savedState.initialMinutes === initialMinutes) {
+        return false; // 🔥 Siempre iniciar pausado al restaurar
+    }
+    return true;
+  });
+
   const [isSessionFinished, setIsSessionFinished] = useState(false);
   
-  const [blockStartTime, setBlockStartTime] = useState(new Date());
-  const [planStartTime] = useState(new Date());
-
-  const currentSession = schedule[currentSessionIndex];
+  const [blockStartTime, setBlockStartTime] = useState(() => {
+      if (savedState && savedState.initialMinutes === initialMinutes && savedState.blockStartTime) {
+          return new Date(savedState.blockStartTime);
+      }
+      return new Date();
+  });
   
-  useEffect(() => {
-    if (Notification.permission !== "granted") Notification.requestPermission();
-  }, []);
+  const [planStartTime] = useState(() => {
+      if (savedState && savedState.initialMinutes === initialMinutes && savedState.planStartTime) {
+          return new Date(savedState.planStartTime);
+      }
+      return new Date();
+  });
+
+  // timeLeft initialization WITHOUT "Catch Up" logic (User Request)
+  const [timeLeft, setTimeLeft] = useState(() => {
+    if (savedState && savedState.initialMinutes === initialMinutes) {
+        return savedState.timeLeft || schedule[0]?.duration || 0;
+    }
+    return schedule[0]?.duration || 0;
+  });
+
+  // 5. Hooks / Logic
+  const currentSession = schedule[currentSessionIndex];
+
+  // Guardrail for missing session
+  if (isActive && !currentSession) {
+      setIsActive(false);
+  }
+
+  // useRef para persistir el tiempo objetivo
+  const endTimeRef = useRef<number>(0);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -71,20 +124,55 @@ export default function TimerRun({ initialMinutes, onReset, lang }: Props) {
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  // 🔥 PERSISTENCIA: Guardar estado
+  useEffect(() => {
+      if (isSessionFinished) {
+          localStorage.removeItem(TIMER_STATE_KEY);
+          return;
+      }
+
+      const stateToSave = {
+          initialMinutes,
+          currentSessionIndex,
+          isActive,
+          timeLeft,
+          endTime: endTimeRef.current,
+          blockStartTime: blockStartTime.toISOString(),
+          planStartTime: planStartTime.toISOString()
+      };
+      
+      localStorage.setItem(TIMER_STATE_KEY, JSON.stringify(stateToSave));
+  }, [currentSessionIndex, isActive, timeLeft, blockStartTime, planStartTime, isSessionFinished, initialMinutes]);
+
+  // Main Timer Logic
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
     
-    if (isActive && timeLeft > 0) {
+    // Update title
+    if (isActive && timeLeft > 0 && currentSession) {
         document.title = `(${formatTime(timeLeft)}) ${currentSession.label}`;
     } else if (!isActive && !isSessionFinished) {
         document.title = "⏸ Pausa";
     }
 
     if (isActive && timeLeft > 0) {
-      interval = setInterval(() => setTimeLeft((t) => t - 1), 1000);
+      if (endTimeRef.current === 0) {
+        endTimeRef.current = Date.now() + timeLeft * 1000;
+      }
+
+      interval = setInterval(() => {
+        const now = Date.now();
+        const diff = endTimeRef.current - now;
+        const secondsRemaining = Math.ceil(diff / 1000);
+
+        if (secondsRemaining <= 0) {
+          setTimeLeft(0);
+        } else {
+           setTimeLeft(secondsRemaining);
+        }
+      }, 200);
     } 
-    else if (timeLeft === 0 && !isSessionFinished) {
-      
+    else if (timeLeft === 0 && !isSessionFinished && currentSession) {
       addSession(
           currentSession.type, 
           Math.floor(currentSession.duration / 60), 
@@ -108,7 +196,8 @@ export default function TimerRun({ initialMinutes, onReset, lang }: Props) {
               setCurrentSessionIndex(nextIndex);
               setTimeLeft(schedule[nextIndex].duration);
               setIsActive(true);
-              setBlockStartTime(new Date()); // 🔥 RESETEAMOS HORA DE INICIO
+              setBlockStartTime(new Date()); 
+              endTimeRef.current = 0; 
           }, 1500);
           return () => clearTimeout(timeout);
       } else {
@@ -117,11 +206,16 @@ export default function TimerRun({ initialMinutes, onReset, lang }: Props) {
           document.title = "✅ ¡Listo!";
       }
     }
+
+    if (!isActive) {
+        endTimeRef.current = 0;
+    }
+
     return () => { 
         if (interval) clearInterval(interval);
         document.title = "Pomodoro Flux"; 
     };
-  }, [isActive, timeLeft, isSessionFinished, currentSession, currentSessionIndex, schedule, blockStartTime]); // Agregamos blockStartTime a deps
+  }, [isActive, timeLeft, isSessionFinished, currentSessionIndex, schedule, blockStartTime]); // Removed currentSession from deps to avoid circularity issues if any
 
   const getTheme = (type: SessionType) => {
       switch (type) {
@@ -146,6 +240,26 @@ export default function TimerRun({ initialMinutes, onReset, lang }: Props) {
       }
   };
   
+  // Guard for rendering
+  if (!currentSession) {
+    return (
+        <div className="flex flex-col items-center justify-center p-10 space-y-4">
+            <h2 className="text-2xl font-bold">Error en la sesión</h2>
+            <p>No se pudo recuperar la sesión actual.</p>
+            <button 
+                className="btn btn-primary"
+                onClick={() => {
+                    localStorage.removeItem(TIMER_STATE_KEY);
+                    localStorage.removeItem('pomodoro_active_session');
+                    onReset();
+                }}
+            >
+                Reiniciar Plan
+            </button>
+        </div>
+    );
+  }
+
   const theme = getTheme(currentSession.type);
   const radius = 120;
   const circumference = 2 * Math.PI * radius;
@@ -221,11 +335,11 @@ export default function TimerRun({ initialMinutes, onReset, lang }: Props) {
                         )}
                     </button>
                 ) : (
-                    <button type="button" className={`btn btn-lg h-16 px-10 rounded-full border-none shadow-xl animate-bounce text-white ${theme.bgButton}`} onClick={onReset}>
+                    <button type="button" className={`btn btn-lg h-16 px-10 rounded-full border-none shadow-xl animate-bounce text-white ${theme.bgButton}`} onClick={() => { localStorage.removeItem('pomodoro_timer_state'); onReset(); }}>
                         Nuevo Plan ↺
                     </button>
                 )}
-                <button type="button" onClick={onReset} className="btn btn-circle btn-ghost opacity-40 hover:opacity-100 tooltip" data-tip="Cancelar Plan">
+                <button type="button" onClick={() => { localStorage.removeItem('pomodoro_timer_state'); onReset(); }} className="btn btn-circle btn-ghost opacity-40 hover:opacity-100 tooltip" data-tip="Cancelar Plan">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>

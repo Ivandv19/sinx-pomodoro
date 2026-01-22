@@ -16,6 +16,17 @@ export default function PomodoroManager({ lang = 'es' }: Props) {
     if (typeof window === 'undefined') return;
     
     try {
+      // 1. Check for running timer state first
+      const timerState = localStorage.getItem('pomodoro_timer_state');
+      if (timerState) {
+          const state = JSON.parse(timerState);
+          if (state.initialMinutes && !state.isSessionFinished) {
+              setSelectedMinutes(state.initialMinutes);
+              return;
+          }
+      }
+
+      // 2. Fallback to just "active session" setup preference
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const state = JSON.parse(saved);
@@ -33,7 +44,10 @@ export default function PomodoroManager({ lang = 'es' }: Props) {
       {selectedMinutes === null ? (
         <TimerSetup 
             lang={lang}
-            onStart={(minutes) => setSelectedMinutes(minutes)}
+            onStart={(minutes) => {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify({ initialMinutes: minutes }));
+              setSelectedMinutes(minutes);
+            }}
           />
       ) : (
         <TimerRun
