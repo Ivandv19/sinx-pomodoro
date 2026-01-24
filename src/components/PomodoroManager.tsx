@@ -1,6 +1,7 @@
 import { useState, useEffect } from "preact/hooks";
 import TimerSetup from "./TimerSetup";
 import TimerRun from "./TimerRun"; 
+import HeroSection from "./HeroSection"; 
 
 interface Props {
   lang?: 'es' | 'en';
@@ -44,6 +45,7 @@ export default function PomodoroManager({ lang = 'es' }: Props) {
 
   return (
     <div className="w-full"> 
+      <HeroSection lang={lang} mode={selectedMinutes === null ? 'default' : 'focus'} /> 
       
       {selectedMinutes === null ? (
         <TimerSetup 

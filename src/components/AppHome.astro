@@ -1,30 +1,10 @@
 ---
 // src/components/pages/AppHome.astro
 import PomodoroManager from './PomodoroManager';
-import { useTranslations } from '../i18n/utils';
-
-interface Props {
-  lang: 'es' | 'en';
-}
-
 const { lang } = Astro.props;
-const t = useTranslations(lang);
 ---
 
-<div class="text-center space-y-4 mb-10 animate-fade-in-up">
-  <h1 class="text-5xl font-extrabold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-    {t('hero.title')}
-  </h1>
-  
-  <p class="text-xl text-base-content/80 max-w-2xl mx-auto">
-    {t('hero.subtitle').split(',')[0]}
-    <span class="text-primary font-bold">{t('hero.span.coding')}</span>, 
-    <span class="text-secondary font-bold">{t('hero.span.studying')}</span>
-     {lang === 'es' ? 'o' : 'or'} 
-    <span class="text-accent font-bold">{t('hero.span.creating')}</span>,
-     {lang === 'es' ? 'el método Pomodoro es tu mejor aliado.' : 'the Pomodoro method is your best ally.'}
-  </p>
-</div>
+
 
 <div class="mt-8">
     <PomodoroManager client:load lang={lang} />

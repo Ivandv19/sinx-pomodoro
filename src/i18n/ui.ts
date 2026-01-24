@@ -16,17 +16,19 @@ export const ui = {
     
     // Hero
     'hero.title': 'Domina tu tiempo',
-    'hero.subtitle': 'Ya sea que estés programando, estudiando o creando, el método Pomodoro es tu mejor aliado.',
+    'hero.subtitle': 'Ya sea que estés, estudiando o creando, el método Pomodoro es tu mejor aliado.',
     'hero.span.coding': 'programando',
     'hero.span.studying': 'estudiando',
     'hero.span.creating': 'creando',
+    'hero.focus.title': 'Máxima Concentración',
+    'hero.focus.subtitle': 'El mundo puede esperar.',
 
     // Timer
-    'timer.focus': 'Modo Enfoque',
-    'timer.short': 'Relax Breve',
-    'timer.long': 'Descanso Largo',
+    'timer.focus': 'Enfoque',
+    'timer.short': 'Descanso',
+    'timer.long': 'Descanso',
     'timer.setup.title': 'Configura tu Ciclo',
-    'timer.setup.subtitle': 'Elige los minutos de enfoque (el estándar es 25):',
+    'timer.setup.subtitle': 'Elige los minutos de enfoque:',
     'timer.setup.btn.start': 'Empezar a concentrarme',
     'timer.setup.btn.start.disabled': 'Selecciona un tiempo...',
     'timer.run.pause': '⏸ Pausar',
@@ -70,15 +72,17 @@ export const ui = {
     
     // Hero
     'hero.title': 'Master your time',
-    'hero.subtitle': 'Whether you are coding, studying, or creating, the Pomodoro method is your best ally.',
+    'hero.subtitle': 'Whether you are, studying or creating, the Pomodoro method is your best ally.',
     'hero.span.coding': 'coding',
     'hero.span.studying': 'studying',
     'hero.span.creating': 'creating',
+    'hero.focus.title': 'Deep Focus',
+    'hero.focus.subtitle': 'The world can wait.',
 
     // Timer
-    'timer.focus': 'Focus Mode',
-    'timer.short': 'Short Break',
-    'timer.long': 'Long Break',
+    'timer.focus': 'Focus',
+    'timer.short': 'Break',
+    'timer.long': 'Break',
     'timer.setup.title': 'Setup your Cycle',
     'timer.setup.subtitle': 'How much time do you have?', // Changed from previous "Setup your Cycle" to match question
     'timer.setup.btn.start': 'Start Session',
