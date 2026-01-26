@@ -94,7 +94,7 @@ export function useTimerLogic({ initialMinutes, onSessionComplete }: UseTimerLog
             if (Notification.permission === "granted") {
                 new Notification(`¡${currentSession.label} terminado!`, {
                     body: "Registrado en tu historial.",
-                    icon: "/favicon.svg"
+                    icon: "/favicon.png"
                 });
             }
 

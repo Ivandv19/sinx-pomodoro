@@ -16,7 +16,7 @@ interface Session {
     label: string;
 }
 
-const ALARM_SOUND = "https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=tibetan-bowl-singing-72688.mp3";
+const ALARM_SOUND = "/alarm.mp3";
 
 export default function TimerRun({ initialMinutes, onReset, lang }: Props) {
   
@@ -198,7 +198,7 @@ export default function TimerRun({ initialMinutes, onReset, lang }: Props) {
       if (Notification.permission === "granted") {
          new Notification(`¡${currentSession.label} ${t('timer.run.finished')}!`, {
             body: lang === 'en' ? "Logged in your history." : "Registrado en tu historial.",
-            icon: "/favicon.svg"
+            icon: "/favicon.png"
          });
       }
 
