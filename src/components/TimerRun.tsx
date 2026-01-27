@@ -367,7 +367,7 @@ export default function TimerRun({ initialMinutes, onReset, lang }: Props) {
         </div>
 
         {/* 2. AGENDA HORIZONTAL (Visual igual) */}
-        <div className="w-full bg-base-100/50 backdrop-blur-sm rounded-2xl p-6 border border-base-200 shadow-sm">
+        <div className="w-full bg-base-100/50 backdrop-blur-sm rounded-2xl p-6 border border-base-200 shadow-sm transition-colors duration-400">
             <div className="mb-6 pb-4 border-b border-base-200 flex justify-between items-center">
                 <div className="flex flex-col">
                     <h3 className="text-lg font-bold opacity-70">{t('timer.run.agenda')}</h3>

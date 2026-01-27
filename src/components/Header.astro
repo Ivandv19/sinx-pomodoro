@@ -14,8 +14,8 @@ const currentPath = Astro.url.pathname.replace(/^\/(en|es)\//, '/').replace(/^\/
 const translatePath = (lang: string) => getRelativeLocaleUrl(lang, currentPath);
 ---
 
-<header class="sticky top-0 z-50 w-full">
-  <nav class="navbar bg-base-100/90 backdrop-blur-md border-b border-base-200">
+<header class="sticky top-0 z-50 w-full transition-colors duration-400">
+  <nav class="navbar bg-base-100/90 backdrop-blur-md border-b border-base-200 transition-colors duration-400">
     
     <div class="navbar-start">
       <div class="dropdown">

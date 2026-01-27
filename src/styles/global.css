@@ -1,27 +1,53 @@
-/* src/styles/global.css */
 @import "tailwindcss";
 @plugin "daisyui";
 
-/* CONFIGURACIÓN DE TEMAS */
-/* Usaremos 'nord' para claro (muy limpio, gris azulado) */
-/* Usaremos 'business' para oscuro (gris oscuro serio, alto contraste) */
+/*
+  Centralized Style System
+  Inspired by Flux (Blog) architecture.
+*/
 
 @theme {
+  /* Brand Colors (Originals) */
   --color-primary: #ea580c;
-  /* Un Naranja/Rojo quemado fuerte (Orange-600) */
+  /* Orange-600 */
   --color-primary-content: #ffffff;
-  /* Texto blanco sobre el naranja */
-
   --color-secondary: #4b5563;
-  /* Gris serio para botones secundarios */
+
+  /* Global Fonts */
+  --font-outfit: 'Outfit', sans-serif;
 }
 
+/* Base Styles */
+body {
+  /* We stop overriding bg-canvas and text-primary to use DaisyUI defaults */
+  font-family: var(--font-outfit);
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
 
-/* ANIMACIONES */
+/* Base Styles */
+body {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-outfit);
+  /* Smooth transition for all semantic properties */
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+/* Headings use System Font (User preference) */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/* ANIMATIONS */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(15px);
   }
 
   to {
@@ -31,5 +57,32 @@
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.4s ease-out forwards;
+  opacity: 0;
+  /* Initial state */
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Stagger delays for premium feel */
+.animate-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animate-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animate-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animate-delay-500 {
+  animation-delay: 500ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
 }
