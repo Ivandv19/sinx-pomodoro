@@ -40,6 +40,14 @@ const jsonLdDescription = lang === 'en'
 		<meta name="generator" content={Astro.generator} />
 		
 		<title>{title}</title>
+		<meta name="robots" content="index, follow" />
+		<link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+		<meta name="keywords" content="pomodoro, timer, focus, productivity, study, work, technique, tomato, temporizador, enfoque, productividad, estudio, trabajo, tecnica" />
+		
+		<link rel="alternate" hreflang="x-default" href="https://sinx-pomodoro.pages.dev" />
+		<link rel="alternate" hreflang="es" href="https://sinx-pomodoro.pages.dev" />
+		<link rel="alternate" hreflang="en" href="https://sinx-pomodoro.pages.dev/en" />
+
 		<ClientRouter />
 		<!-- Google Analytics (gtag.js) -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-L4W9E2FP48"></script>
@@ -87,6 +95,7 @@ const jsonLdDescription = lang === 'en'
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content="website" />
 		<meta property="og:image" content={image} />
+		<meta property="og:url" content={Astro.url} />
 
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={title} />
