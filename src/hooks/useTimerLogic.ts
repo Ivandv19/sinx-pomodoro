@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'preact/hooks';
 import type { SessionType } from './usePomodoroStats';
 
-const ALARM_SOUND = "/alarm.mp3";
+const ALARM_SOUND = "https://pomodoro-assets.mgdc.site/alarm.mp3";
 
 export interface Session {
     type: SessionType;
@@ -94,7 +94,7 @@ export function useTimerLogic({ initialMinutes, onSessionComplete }: UseTimerLog
             if (Notification.permission === "granted") {
                 new Notification(`¡${currentSession.label} terminado!`, {
                     body: "Registrado en tu historial.",
-                    icon: "/favicon.png"
+                    icon: "https://pomodoro-assets.mgdc.site/favicon.png"
                 });
             }
 

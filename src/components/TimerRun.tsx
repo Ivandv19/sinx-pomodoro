@@ -16,7 +16,7 @@ interface Session {
     label: string;
 }
 
-const ALARM_SOUND = "/alarm.mp3";
+const ALARM_SOUND = "https://pomodoro-assets.mgdc.site/alarm.mp3";
 
 export default function TimerRun({ initialMinutes, onReset, lang }: Props) {
   
@@ -206,7 +206,7 @@ export default function TimerRun({ initialMinutes, onReset, lang }: Props) {
         if (Notification.permission === "granted") {
            new Notification(`¡${currentSession.label} ${t('timer.run.finished')}!`, {
               body: lang === 'en' ? "Logged in your history." : "Registrado en tu historial.",
-              icon: "/favicon.png"
+              icon: "https://pomodoro-assets.mgdc.site/favicon.png"
            });
         }
       }
