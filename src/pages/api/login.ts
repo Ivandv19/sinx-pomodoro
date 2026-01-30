@@ -1,5 +1,5 @@
 import { initializeLucia } from "../../lib/auth";
-import { Argon2id } from "oslo/password";
+import { Scrypt } from "oslo/password";
 import type { APIContext } from "astro";
 
 export async function POST(context: APIContext): Promise<Response> {
@@ -22,8 +22,8 @@ export async function POST(context: APIContext): Promise<Response> {
         return new Response(JSON.stringify({ error: "Incorrect email or password" }), { status: 400 });
     }
 
-    // 2. Verify Password
-    const validPassword = await new Argon2id().verify(existingUser.hashed_password, password);
+    // 2. Verify Password (using Scrypt for Cloudflare Workers compatibility)
+    const validPassword = await new Scrypt().verify(existingUser.hashed_password, password);
 
     if (!validPassword) {
         return new Response(JSON.stringify({ error: "Incorrect email or password" }), { status: 400 });
@@ -36,3 +36,4 @@ export async function POST(context: APIContext): Promise<Response> {
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
 }
+

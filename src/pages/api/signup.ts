@@ -1,7 +1,7 @@
 import { defineMiddleware } from "astro:middleware";
 import { initializeLucia } from "../../lib/auth";
 import { generateId } from "lucia";
-import { Argon2id } from "oslo/password";
+import { Scrypt } from "oslo/password";
 import type { APIContext } from "astro";
 
 export async function POST(context: APIContext): Promise<Response> {
@@ -25,7 +25,8 @@ export async function POST(context: APIContext): Promise<Response> {
 
     try {
         const userId = generateId(15);
-        const passwordHash = await new Argon2id().hash(password);
+        // Using Scrypt for Cloudflare Workers compatibility
+        const passwordHash = await new Scrypt().hash(password);
 
         // 3. Create User
         await db.prepare("INSERT INTO user (id, email, hashed_password, created_at) VALUES (?, ?, ?, ?)")
@@ -50,3 +51,4 @@ export async function POST(context: APIContext): Promise<Response> {
         return new Response(JSON.stringify({ error: "An unknown error occurred" }), { status: 500 });
     }
 }
+
