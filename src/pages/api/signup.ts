@@ -1,8 +1,7 @@
 import { defineMiddleware } from "astro:middleware";
 import { initializeLucia } from "../../lib/auth";
 import { generateId } from "lucia";
-import { scrypt } from "@noble/hashes/scrypt";
-import { bytesToHex, hexToBytes, randomBytes } from "@noble/hashes/utils";
+import bcrypt from "bcryptjs";
 import type { APIContext } from "astro";
 
 export async function POST(context: APIContext): Promise<Response> {
@@ -27,10 +26,8 @@ export async function POST(context: APIContext): Promise<Response> {
     try {
         const userId = generateId(15);
         
-        // Using @noble/hashes scrypt (pure JS, Cloudflare Workers compatible)
-        const salt = randomBytes(16);
-        const hash = scrypt(password, salt, { N: 16384, r: 8, p: 1, dkLen: 32 });
-        const passwordHash = `${bytesToHex(salt)}:${bytesToHex(hash)}`;
+        // Using bcryptjs (pure JS, Cloudflare Workers compatible)
+        const passwordHash = await bcrypt.hash(password, 10);
 
         // 3. Create User
         await db.prepare("INSERT INTO user (id, email, hashed_password, created_at) VALUES (?, ?, ?, ?)")
