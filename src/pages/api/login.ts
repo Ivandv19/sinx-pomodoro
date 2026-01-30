@@ -1,5 +1,6 @@
 import { initializeLucia } from "../../lib/auth";
-import { Scrypt } from "oslo/password";
+import { scrypt } from "@noble/hashes/scrypt";
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import type { APIContext } from "astro";
 
 export async function POST(context: APIContext): Promise<Response> {
@@ -22,8 +23,10 @@ export async function POST(context: APIContext): Promise<Response> {
         return new Response(JSON.stringify({ error: "Incorrect email or password" }), { status: 400 });
     }
 
-    // 2. Verify Password (using Scrypt for Cloudflare Workers compatibility)
-    const validPassword = await new Scrypt().verify(existingUser.hashed_password, password);
+    // 2. Verify Password (using @noble/hashes scrypt - pure JS)
+    const [salt, hash] = existingUser.hashed_password.split(':');
+    const passwordHash = scrypt(password, hexToBytes(salt), { N: 16384, r: 8, p: 1, dkLen: 32 });
+    const validPassword = bytesToHex(passwordHash) === hash;
 
     if (!validPassword) {
         return new Response(JSON.stringify({ error: "Incorrect email or password" }), { status: 400 });

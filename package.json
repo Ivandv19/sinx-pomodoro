@@ -17,6 +17,7 @@
     "@astrojs/sitemap": "^3.7.0",
     "@fontsource/outfit": "^5.2.8",
     "@lucia-auth/adapter-sqlite": "^3.0.2",
+    "@noble/hashes": "^2.0.1",
     "@tailwindcss/vite": "^4.1.18",
     "arctic": "^3.7.0",
     "astro": "^5.17.1",

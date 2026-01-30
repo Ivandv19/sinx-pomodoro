@@ -10,6 +10,7 @@
         "@astrojs/sitemap": "^3.7.0",
         "@fontsource/outfit": "^5.2.8",
         "@lucia-auth/adapter-sqlite": "^3.0.2",
+        "@noble/hashes": "^2.0.1",
         "@tailwindcss/vite": "^4.1.18",
         "arctic": "^3.7.0",
         "astro": "^5.17.1",
@@ -273,6 +274,8 @@
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
     "@lucia-auth/adapter-sqlite": ["@lucia-auth/adapter-sqlite@3.0.2", "", { "peerDependencies": { "@libsql/client": "^0.3.0", "better-sqlite3": "8.x - 11.x", "lucia": "3.x" }, "optionalPeers": ["@libsql/client", "better-sqlite3"] }, "sha512-UlXpF+2UoFEdm1AsriJii5BOARwqko6SX29rQ8T8Za7rnjj9KLXLaRVQUgBhGmggAyvzCtguJ2+XOZDsfWm6Sw=="],
+
+    "@noble/hashes": ["@noble/hashes@2.0.1", "", {}, "sha512-XlOlEbQcE9fmuXxrVTXCTlG2nlRXa9Rj3rr5Ue/+tX+nmkgbX720YHh0VR3hBF9xDvwnb8D2shVGOwNx+ulArw=="],
 
     "@node-rs/argon2": ["@node-rs/argon2@1.7.0", "", { "optionalDependencies": { "@node-rs/argon2-android-arm-eabi": "1.7.0", "@node-rs/argon2-android-arm64": "1.7.0", "@node-rs/argon2-darwin-arm64": "1.7.0", "@node-rs/argon2-darwin-x64": "1.7.0", "@node-rs/argon2-freebsd-x64": "1.7.0", "@node-rs/argon2-linux-arm-gnueabihf": "1.7.0", "@node-rs/argon2-linux-arm64-gnu": "1.7.0", "@node-rs/argon2-linux-arm64-musl": "1.7.0", "@node-rs/argon2-linux-x64-gnu": "1.7.0", "@node-rs/argon2-linux-x64-musl": "1.7.0", "@node-rs/argon2-wasm32-wasi": "1.7.0", "@node-rs/argon2-win32-arm64-msvc": "1.7.0", "@node-rs/argon2-win32-ia32-msvc": "1.7.0", "@node-rs/argon2-win32-x64-msvc": "1.7.0" } }, "sha512-zfULc+/tmcWcxn+nHkbyY8vP3+MpEqKORbszt4UkpqZgBgDAAIYvuDN/zukfTgdmo6tmJKKVfzigZOPk4LlIog=="],
 
