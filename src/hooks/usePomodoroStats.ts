@@ -87,7 +87,7 @@ export function usePomodoroStats() {
         body: JSON.stringify({
             type,
             minutes,
-            createdAt: startTime.getTime() 
+            createdAt: now.getTime() // ✅ Usa endTime (cuando terminó), igual que localStorage
         })
     }).catch(err => console.log("No se pudo sincronizar con la nube:", err));
   };
