@@ -54,8 +54,8 @@ export default function DailySummary({ lang, history, hours, minutes, count }: P
                             <div key={entry.id} className="relative pl-6">
                                 {/* Puntito de color */}
                                 <div className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full border-2 border-base-200 ${
-                                    entry.type === 'focus' ? 'bg-orange-500' : 
-                                    entry.type === 'short' ? 'bg-emerald-500' : 'bg-indigo-500'
+                                    entry.type === 'focus' ? 'bg-primary-500' : 
+                                    entry.type === 'short' ? 'bg-short-500' : 'bg-long-500'
                                 }`}></div>
                                 
                                 <div className="flex flex-col">

@@ -6,14 +6,26 @@ import sitemap from '@astrojs/sitemap';
 import preact from "@astrojs/preact";
 
 export default defineConfig({
-  output: 'static',
-  adapter: cloudflare(),
+  output: 'server',
+  adapter: cloudflare({
+    platformProxy: {
+      enabled: true,
+    },
+  }),
   site: 'https://sinx-pomodoro.pages.dev',
   prefetch: true,
   integrations: [preact(), sitemap()], 
   
   vite: {
     plugins: [tailwindcss()],
+    ssr: {
+      external: ['@node-rs/argon2', '@node-rs/bcrypt']
+    },
+    server: {
+      watch: {
+        ignored: ['**/.wrangler/**']
+      }
+    }
   },
 
   i18n: {

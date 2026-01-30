@@ -5,11 +5,12 @@ import HeroSection from "./HeroSection";
 
 interface Props {
   lang?: 'es' | 'en';
+  isLoggedIn?: boolean;
 }
 
 const STORAGE_KEY = 'pomodoro_active_session';
 
-export default function PomodoroManager({ lang = 'es' }: Props) {
+export default function PomodoroManager({ lang = 'es', isLoggedIn = false }: Props) {
   const [selectedMinutes, setSelectedMinutes] = useState<number | null>(null);
 
   // 🔥 Check for saved session on mount
@@ -60,6 +61,7 @@ export default function PomodoroManager({ lang = 'es' }: Props) {
             lang={lang}
             initialMinutes={selectedMinutes}
             onReset={() => setSelectedMinutes(null)}
+            isLoggedIn={isLoggedIn}
           />
       )}
       

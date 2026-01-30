@@ -13,6 +13,8 @@ const t = useTranslations(currentLang as 'es' | 'en');
 // 3. Generar rutas dinámicas
 const currentPath = Astro.url.pathname.replace(/^\/(en|es)\//, '/').replace(/^\//, ''); 
 const translatePath = (lang: string) => getRelativeLocaleUrl(lang, currentPath);
+
+const { user } = Astro.locals;
 ---
 
 <header class="sticky top-0 z-50 w-full transition-colors duration-400">
@@ -42,6 +44,19 @@ const translatePath = (lang: string) => getRelativeLocaleUrl(lang, currentPath);
     </div>
 
     <div class="navbar-end gap-2">
+      {
+        user ? (
+            <form method="POST" action="/api/logout">
+                <button type="submit" class="btn btn-ghost btn-sm text-primary hover:text-primary-focus">
+                    {currentLang === 'es' ? 'Salir' : 'Logout'}
+                </button>
+            </form>
+        ) : (
+            <a href={getRelativeLocaleUrl(currentLang, 'login')} class="btn btn-ghost btn-sm">
+                {currentLang === 'es' ? 'Entrar' : 'Login'}
+            </a>
+        )
+      }
       <LanguagePicker />
 
       <label class="swap swap-rotate btn btn-ghost btn-circle btn-sm">

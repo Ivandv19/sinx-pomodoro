@@ -1,8 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import AppHome from '../components/AppHome.astro';
+const user = Astro.locals.user;
 ---
 
 <Layout title="Sinx Pomodoro">
-  <AppHome lang="es" />
+  <AppHome lang="es" user={user} />
 </Layout>

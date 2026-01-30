@@ -16,8 +16,12 @@
     "@astrojs/preact": "^4.1.3",
     "@astrojs/sitemap": "^3.7.0",
     "@fontsource/outfit": "^5.2.8",
+    "@lucia-auth/adapter-sqlite": "^3.0.2",
     "@tailwindcss/vite": "^4.1.18",
+    "arctic": "^3.7.0",
     "astro": "^5.17.1",
+    "lucia": "^3.2.2",
+    "oslo": "^1.2.1",
     "preact": "^10.28.2",
     "tailwindcss": "^4.1.18"
   },

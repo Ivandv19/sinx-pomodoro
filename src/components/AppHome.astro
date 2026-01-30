@@ -1,11 +1,11 @@
 ---
 // src/components/pages/AppHome.astro
 import PomodoroManager from './PomodoroManager';
-const { lang } = Astro.props;
+const { lang, user } = Astro.props;
 ---
 
 
 
 <div class="mt-8">
-    <PomodoroManager client:load lang={lang} />
+    <PomodoroManager client:load lang={lang} isLoggedIn={!!user} />
 </div>

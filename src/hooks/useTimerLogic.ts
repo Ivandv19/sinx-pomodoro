@@ -140,22 +140,22 @@ export function useTimerLogic({ initialMinutes, onSessionComplete }: UseTimerLog
     const getTheme = (type: SessionType) => {
         switch (type) {
             case 'focus': return { 
-              color: 'text-orange-600 dark:text-orange-500', 
-              stroke: 'stroke-orange-600 dark:stroke-orange-500',
-              bgButton: 'bg-orange-600 hover:bg-orange-700 text-white',
-              border: 'border-b-orange-500'
+              color: 'text-primary-600 dark:text-primary-500', 
+              stroke: 'stroke-primary-600 dark:stroke-primary-500',
+              bgButton: 'bg-primary-600 hover:bg-primary-700 text-white',
+              border: 'border-b-primary-500'
             };
             case 'short': return { 
-              color: 'text-emerald-600 dark:text-emerald-400', 
-              stroke: 'stroke-emerald-600 dark:stroke-emerald-400',
-              bgButton: 'bg-emerald-600 hover:bg-emerald-700 text-white',
-              border: 'border-b-emerald-500'
+              color: 'text-short-600 dark:text-short-400', 
+              stroke: 'stroke-short-600 dark:stroke-short-400',
+              bgButton: 'bg-short-600 hover:bg-short-600/90 text-white', // Adjusted hover
+              border: 'border-b-short-500'
             };
             case 'long': return { 
-              color: 'text-indigo-600 dark:text-indigo-400', 
-              stroke: 'stroke-indigo-600 dark:stroke-indigo-400',
-              bgButton: 'bg-indigo-600 hover:bg-indigo-700 text-white',
-              border: 'border-b-indigo-500'
+              color: 'text-long-600 dark:text-long-400', 
+              stroke: 'stroke-long-600 dark:stroke-long-400',
+              bgButton: 'bg-long-600 hover:bg-long-600/90 text-white',
+              border: 'border-b-long-500'
             };
         }
     };

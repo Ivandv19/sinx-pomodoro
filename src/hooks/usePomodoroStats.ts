@@ -15,8 +15,8 @@ export function usePomodoroStats() {
   // 🔥 CAMBIO: Inicialización "Lazy"
   // En lugar de arrancar vacío, leemos localStorage DIRECTAMENTE en el estado inicial.
   // Así no hay "parpadeo" de datos vacíos.
-  const [history, setHistory] = useState<LogEntry[]>(() => {
-    // Si estamos en el servidor (Astro build), regresamos vacío
+  // Estado que guarda TODO el historial reciente (últimos 30 días)
+  const [fullHistory, setFullHistory] = useState<LogEntry[]>(() => {
     if (typeof window === "undefined") return [];
 
     try {
@@ -25,23 +25,13 @@ export function usePomodoroStats() {
 
       const allHistory: LogEntry[] = JSON.parse(saved);
       const now = new Date();
-      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 días atrás
+      // 🔥 CAMBIO: Limitamos a 7 días por defecto (Plan Free/Guest)
+      const daysToKeep = 7; 
+      const cutOffDate = new Date(now.getTime() - daysToKeep * 24 * 60 * 60 * 1000);
 
-      // Filtramos solo entradas de los últimos 30 días
-      const recentHistory = allHistory.filter(
-        (entry) => new Date(entry.endTime) >= thirtyDaysAgo,
-      );
-
-      // Si había datos viejos, actualizamos localStorage
-      if (recentHistory.length !== allHistory.length) {
-        localStorage.setItem("pomodoro_history", JSON.stringify(recentHistory));
-      }
-
-      const today = now.toLocaleDateString();
-
-      // Filtramos solo los de hoy para el estado
-      return recentHistory.filter(
-        (entry) => new Date(entry.endTime).toLocaleDateString() === today,
+      // Filtramos solo entradas de los últimos 7 días
+      return allHistory.filter(
+        (entry) => new Date(entry.endTime) >= cutOffDate,
       );
     } catch (error) {
       console.error("Error leyendo historial:", error);
@@ -49,7 +39,24 @@ export function usePomodoroStats() {
     }
   });
 
-  // Función para guardar (se mantiene igual, pero más robusta)
+  // Cargar desde la Nube
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    fetch('/api/pomodoros')
+      .then(res => {
+          if (res.ok) return res.json();
+          throw new Error('Not logged in or error');
+      })
+      .then((cloudHistory: LogEntry[]) => {
+          // Guardamos TODO lo que viene de la nube (que ya viene limitado a 50 o por fecha)
+          setFullHistory(cloudHistory);
+      })
+      .catch(() => {
+          console.log("Modo Offline o Invitado: Usando historial local.");
+      });
+  }, []);
+
   const addSession = (type: SessionType, minutes: number, startTime: Date) => {
     const now = new Date();
     const newEntry: LogEntry = {
@@ -60,12 +67,9 @@ export function usePomodoroStats() {
       endTime: now.toISOString(),
     };
 
-    // Actualizamos estado visual
-    const updatedHistory = [...history, newEntry];
-    setHistory(updatedHistory);
+    const updatedHistory = [newEntry, ...fullHistory]; // Ponemos el nuevo al principio
+    setFullHistory(updatedHistory);
 
-    // Guardamos en LocalStorage (Persistencia)
-    // Leemos todo lo que había antes (incluso de otros días) para no borrarlo
     try {
       const existingRaw = localStorage.getItem("pomodoro_history");
       const existing = existingRaw ? JSON.parse(existingRaw) : [];
@@ -76,17 +80,60 @@ export function usePomodoroStats() {
     } catch (e) {
       console.error("No se pudo guardar en localStorage", e);
     }
+
+    fetch('/api/pomodoros', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            type,
+            minutes,
+            createdAt: startTime.getTime() 
+        })
+    }).catch(err => console.log("No se pudo sincronizar con la nube:", err));
   };
 
-  const totalFocusMinutes = history
+  // 1. Datos de HOY (Para compatibilidad con lo existente)
+  const today = new Date().toLocaleDateString();
+  const todaysHistory = fullHistory.filter(
+    (entry) => new Date(entry.endTime).toLocaleDateString() === today
+  );
+
+  const totalFocusMinutes = todaysHistory
     .filter((h) => h.type === "focus")
     .reduce((acc, curr) => acc + curr.minutes, 0);
 
+  // 2. Datos de la SEMANA (Lunes - Domingo)
+  const getWeeklyStats = () => {
+      const now = new Date();
+      const currentDay = now.getDay(); // 0 (Sun) - 6 (Sat)
+      const distanceToMonday = (currentDay + 6) % 7; // Cuantos días atrás está el lunes
+      const mondayDate = new Date(now);
+      mondayDate.setDate(now.getDate() - distanceToMonday);
+      mondayDate.setHours(0, 0, 0, 0);
+
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      const stats = days.map(day => ({ day, minutes: 0, count: 0 }));
+
+      fullHistory.forEach(entry => {
+          const entryDate = new Date(entry.endTime);
+          // Verificar si está en la semana actual (desde el Lunes 00:00)
+          if (entryDate >= mondayDate && entry.type === 'focus') { // Solo contamos Focus para stats
+              const dayIndex = (entryDate.getDay() + 6) % 7; // Convertir 0 (Sun) -> 6, 1 (Mon) -> 0
+              if (stats[dayIndex]) {
+                  stats[dayIndex].minutes += entry.minutes;
+                  stats[dayIndex].count += 1;
+              }
+          }
+      });
+      return stats;
+  };
+
   return {
-    history,
+    history: todaysHistory, // Mantenemos el nombre para no romper nada
     addSession,
     hours: Math.floor(totalFocusMinutes / 60),
     minutes: totalFocusMinutes % 60,
-    sessionCount: history.filter((h) => h.type === "focus").length,
+    sessionCount: todaysHistory.filter((h) => h.type === "focus").length,
+    weeklyStats: getWeeklyStats() // ¡Nuevo!
   };
 }

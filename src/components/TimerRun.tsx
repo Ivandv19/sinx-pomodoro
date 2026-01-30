@@ -2,12 +2,14 @@
 import { useState, useEffect, useMemo, useRef } from 'preact/hooks';
 import { usePomodoroStats, type SessionType } from '../hooks/usePomodoroStats';
 import DailySummary from './DailySummary';
+import WeeklySummary from './WeeklySummary';
 import { useTranslations } from '../i18n/utils';
 
 interface Props {
     initialMinutes: number;
     onReset: () => void;
     lang: 'es' | 'en';
+    isLoggedIn?: boolean; 
 }
 
 interface Session {
@@ -18,9 +20,9 @@ interface Session {
 
 const ALARM_SOUND = "https://pomodoro-assets.mgdc.site/alarm.mp3";
 
-export default function TimerRun({ initialMinutes, onReset, lang }: Props) {
+export default function TimerRun({ initialMinutes, onReset, lang, isLoggedIn = false }: Props) {
   
-  const { addSession, history, hours, minutes, sessionCount } = usePomodoroStats();
+  const { addSession, history, hours, minutes, sessionCount, weeklyStats } = usePomodoroStats();
   const t = useTranslations(lang);
 
   const schedule = useMemo(() => {
@@ -241,22 +243,22 @@ export default function TimerRun({ initialMinutes, onReset, lang }: Props) {
   const getTheme = (type: SessionType) => {
       switch (type) {
           case 'focus': return { 
-            color: 'text-orange-600 dark:text-orange-500', 
-            stroke: 'stroke-orange-600 dark:stroke-orange-500',
-            bgButton: 'bg-orange-600 hover:bg-orange-700 text-white',
-            border: 'border-b-orange-500'
+            color: 'text-primary-600 dark:text-primary-500', 
+            stroke: 'stroke-primary-600 dark:stroke-primary-500',
+            bgButton: 'bg-primary-600 hover:bg-primary-700 text-white',
+            border: 'border-b-primary-500'
           };
           case 'short': return { 
-            color: 'text-emerald-600 dark:text-emerald-400', 
-            stroke: 'stroke-emerald-600 dark:stroke-emerald-400',
-            bgButton: 'bg-emerald-600 hover:bg-emerald-700 text-white',
-            border: 'border-b-emerald-500'
+            color: 'text-short-600 dark:text-short-400', 
+            stroke: 'stroke-short-600 dark:stroke-short-400',
+            bgButton: 'bg-short-600 hover:bg-short-600/90 text-white',
+            border: 'border-b-short-500'
           };
           case 'long': return { 
-            color: 'text-indigo-600 dark:text-indigo-400', 
-            stroke: 'stroke-indigo-600 dark:stroke-indigo-400',
-            bgButton: 'bg-indigo-600 hover:bg-indigo-700 text-white',
-            border: 'border-b-indigo-500'
+            color: 'text-long-600 dark:text-long-400', 
+            stroke: 'stroke-long-600 dark:stroke-long-400',
+            bgButton: 'bg-long-600 hover:bg-long-600/90 text-white',
+            border: 'border-b-long-500'
           };
       }
   };
@@ -408,13 +410,47 @@ export default function TimerRun({ initialMinutes, onReset, lang }: Props) {
         </div>
 
         {/* 3. 🔥 STATS / TRACKER (COMPONENTIZADO) */}
-        <DailySummary 
-            lang={lang}
-            history={history} 
-            hours={hours} 
-            minutes={minutes} 
-            count={sessionCount} 
-        />
+        <div className="w-full flex flex-col gap-4">
+            <DailySummary 
+                lang={lang}
+                history={history} 
+                hours={hours} 
+                minutes={minutes} 
+                count={sessionCount} 
+            />
+            {isLoggedIn ? (
+                <WeeklySummary lang={lang} weeklyStats={weeklyStats} />
+            ) : (
+                <div className="w-full bg-base-200/50 p-6 rounded-2xl border border-base-200 shadow-md animate-fade-in-up relative overflow-hidden group select-none">
+                     {/* Fondo Falso para simular contenido */}
+                     <div className="opacity-30 blur-sm pointer-events-none filter grayscale">
+                        <h4 className="text-xs font-bold uppercase opacity-50 mb-6">
+                            {lang === 'es' ? 'Resumen Semanal' : 'Weekly Summary'}
+                        </h4>
+                        <div className="flex justify-between items-end h-32 gap-2">
+                             {[...Array(7)].map((_, i) => (
+                                 <div key={i} className="bg-base-300 w-full rounded-t-lg" style={{ height: `${Math.random() * 60 + 20}%` }}></div>
+                             ))}
+                        </div>
+                     </div>
+
+                     {/* Overlay CTA */}
+                     <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-base-100/10 backdrop-blur-[2px] p-6 text-center">
+                        <div className="bg-base-100/90 p-5 rounded-xl shadow-2xl border border-base-content/5 backdrop-blur-xl transform transition-transform hover:scale-105">
+                            <h3 className="text-sm font-bold mb-1">
+                                {lang === 'es' ? 'Desbloquea tus estadísticas' : 'Unlock your stats'}
+                            </h3>
+                            <p className="text-xs opacity-70 mb-4 max-w-[200px] leading-relaxed">
+                                {lang === 'es' ? 'Regístrate para ver tu progreso semanal y guardar tu historial en la nube.' : 'Sign up to see your weekly progress and sync your history to the cloud.'}
+                            </p>
+                            <a href={`/${lang === 'es' ? 'login' : 'en/login'}`} className="btn btn-primary btn-sm btn-wide shadow-lg shadow-primary/20">
+                                {lang === 'es' ? 'Iniciar Sesión / Registro' : 'Login / Signup'}
+                            </a>
+                        </div>
+                     </div>
+                </div>
+            )}
+        </div>
 
       </div>
     </div>
